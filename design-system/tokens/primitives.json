@@ -1,0 +1,264 @@
+{
+  "$schema": "./primitives.schema.json",
+  "$description": "Vellum primitives. Raw values only. Nothing in a component may reference this layer directly — components consume semantic.json. Ramps follow the 50-950 convention; 25 exists on neutral and feedback ramps because near-white surfaces need finer steps than near-black ones.",
+  "color": {
+    "indigo": {
+      "$description": "Primary. Academic and credible; deliberately off both startup-purple and corporate-blue.",
+      "50": "#EEF1FB",
+      "100": "#DDE3F7",
+      "200": "#BAC6EF",
+      "300": "#92A5E4",
+      "400": "#6B82D6",
+      "500": "#4A61C4",
+      "600": "#3A4CA8",
+      "700": "#2E3C85",
+      "800": "#253066",
+      "900": "#1B2249",
+      "950": "#11162E"
+    },
+    "amber": {
+      "$description": "Accent. Progress, streaks, study-plan milestones, marked-for-review. NEVER a primary action.",
+      "25": "#FFFCF5",
+      "50": "#FFFAEB",
+      "100": "#FEF0C7",
+      "200": "#FEDF89",
+      "300": "#FEC84B",
+      "400": "#F5A524",
+      "500": "#E8930C",
+      "600": "#C2740A",
+      "700": "#B45309",
+      "800": "#92400E",
+      "900": "#713007",
+      "950": "#431C03"
+    },
+    "neutral": {
+      "$description": "Slate-tinted, not pure gray, so it sits with the indigo rather than fighting it.",
+      "0": "#FFFFFF",
+      "25": "#FCFCFD",
+      "50": "#F8F9FB",
+      "100": "#F1F3F7",
+      "200": "#E4E7EE",
+      "300": "#CDD2DE",
+      "400": "#98A0B3",
+      "500": "#6B7385",
+      "600": "#4D5464",
+      "700": "#383E4B",
+      "800": "#232833",
+      "850": "#1C2029",
+      "900": "#15181F",
+      "950": "#0C0E13"
+    },
+    "green": {
+      "$description": "Answer-correct family. Separate from semantic success on purpose.",
+      "25": "#F6FEF9",
+      "50": "#ECFDF3",
+      "100": "#D1FADF",
+      "200": "#ABEFC6",
+      "300": "#6CE9A6",
+      "400": "#32D583",
+      "500": "#12B76A",
+      "600": "#039855",
+      "700": "#027A48",
+      "800": "#05603A",
+      "900": "#054F31",
+      "950": "#053321"
+    },
+    "rose": {
+      "$description": "Answer-incorrect family. Rose-crimson, not red: a wrong answer is information, not an error the user caused.",
+      "25": "#FFF5F6",
+      "50": "#FFF1F3",
+      "100": "#FFE4E8",
+      "200": "#FECDD6",
+      "300": "#FEA3B4",
+      "400": "#FD6F8E",
+      "500": "#F63D68",
+      "600": "#E31B54",
+      "700": "#C01048",
+      "800": "#A11043",
+      "900": "#89123E",
+      "950": "#510B24"
+    },
+    "red": {
+      "$description": "Semantic error only. Toasts, validation, connectivity. Never answer feedback.",
+      "50": "#FEF3F2",
+      "100": "#FEE4E2",
+      "200": "#FECDCA",
+      "300": "#FDA29B",
+      "400": "#F97066",
+      "500": "#F04438",
+      "600": "#D92D20",
+      "700": "#B42318",
+      "800": "#912018",
+      "900": "#7A271A",
+      "950": "#55160C"
+    },
+    "teal": {
+      "$description": "Semantic success only.",
+      "50": "#ECFDF5",
+      "100": "#D0F8E6",
+      "200": "#A3F0CE",
+      "300": "#5FE0AD",
+      "400": "#26C68B",
+      "500": "#12A171",
+      "600": "#12805C",
+      "700": "#10654A",
+      "800": "#0D4F3A",
+      "900": "#0A3B2C",
+      "950": "#05211A"
+    },
+    "blue": {
+      "$description": "Semantic info only.",
+      "50": "#EFF6FF",
+      "100": "#DBE9FE",
+      "200": "#BFD7FE",
+      "300": "#93BAFD",
+      "400": "#6095F9",
+      "500": "#3B76F6",
+      "600": "#175CD3",
+      "700": "#1449A6",
+      "800": "#163E86",
+      "900": "#17376B",
+      "950": "#102347"
+    },
+    "transparent": "transparent"
+  },
+
+  "font": {
+    "family": {
+      "sans": "'Inter var', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "serif": "Literata, 'Source Serif 4', Georgia, 'Times New Roman', serif",
+      "mono": "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace",
+      "math": "KaTeX_Main, 'Latin Modern Math', 'STIX Two Math', Cambria Math, serif"
+    },
+    "weight": {
+      "regular": "400",
+      "medium": "500",
+      "semibold": "600",
+      "bold": "700"
+    },
+    "size": {
+      "display": "40px",
+      "h1": "32px",
+      "h2": "26px",
+      "h3": "21px",
+      "h4": "18px",
+      "passage": "18px",
+      "body": "16px",
+      "body-sm": "14px",
+      "caption": "13px",
+      "overline": "12px"
+    },
+    "line-height": {
+      "display": "44px",
+      "h1": "38px",
+      "h2": "32px",
+      "h3": "28px",
+      "h4": "26px",
+      "passage": "30px",
+      "body": "26px",
+      "body-sm": "22px",
+      "caption": "18px",
+      "overline": "16px"
+    },
+    "tracking": {
+      "tighter": "-0.02em",
+      "tight": "-0.01em",
+      "normal": "0",
+      "wide": "0.01em",
+      "wider": "0.06em"
+    }
+  },
+
+  "space": {
+    "$description": "4px base. space-0 through space-11. No arbitrary values anywhere in the product.",
+    "0": "0px",
+    "1": "4px",
+    "2": "8px",
+    "3": "12px",
+    "4": "16px",
+    "5": "24px",
+    "6": "32px",
+    "7": "40px",
+    "8": "48px",
+    "9": "64px",
+    "10": "80px",
+    "11": "96px"
+  },
+
+  "radius": {
+    "sm": "6px",
+    "md": "10px",
+    "lg": "14px",
+    "xl": "20px",
+    "full": "9999px"
+  },
+
+  "size": {
+    "touch-min": "44px",
+    "answer-row-min": "56px",
+    "control-sm": "32px",
+    "control-md": "40px",
+    "control-lg": "48px",
+    "focus-ring-width": "2px",
+    "focus-ring-offset": "2px"
+  },
+
+  "layout": {
+    "max-content": "1200px",
+    "reading-measure": "68ch",
+    "grid-columns": "12",
+    "gutter-mobile": "16px",
+    "gutter-tablet": "24px",
+    "gutter-desktop": "32px"
+  },
+
+  "breakpoint": {
+    "xs": "480px",
+    "sm": "768px",
+    "md": "1024px",
+    "lg": "1280px"
+  },
+
+  "shadow": {
+    "$description": "Two-layer, low-contrast. Dark mode does not use these; it lightens a 1px border instead, because shadow on a dark surface reads as haze.",
+    "1": "0 1px 2px rgb(16 24 40 / 0.04), 0 1px 3px rgb(16 24 40 / 0.08)",
+    "2": "0 2px 4px rgb(16 24 40 / 0.04), 0 4px 8px rgb(16 24 40 / 0.08)",
+    "3": "0 4px 8px rgb(16 24 40 / 0.04), 0 12px 20px rgb(16 24 40 / 0.10)",
+    "4": "0 8px 16px rgb(16 24 40 / 0.06), 0 24px 40px rgb(16 24 40 / 0.12)"
+  },
+
+  "duration": {
+    "instant": "80ms",
+    "fast": "140ms",
+    "base": "200ms",
+    "slow": "280ms",
+    "settle": "170ms",
+    "celebrate": "450ms"
+  },
+
+  "stagger": {
+    "$description": "Choreography offsets for the submit sequence. Named so the staging in docs/06-motion.md and the CSS cannot drift apart.",
+    "none": "0ms",
+    "reveal": "90ms",
+    "explanation": "200ms",
+    "explanation-content": "280ms"
+  },
+
+  "easing": {
+    "out": "cubic-bezier(0.2, 0, 0, 1)",
+    "in": "cubic-bezier(0.4, 0, 1, 1)",
+    "in-out": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "spring": "cubic-bezier(0.2, 0.9, 0.2, 1.05)"
+  },
+
+  "z": {
+    "base": "0",
+    "sticky": "100",
+    "navigator": "200",
+    "sheet": "300",
+    "modal": "400",
+    "toast": "500",
+    "tooltip": "600",
+    "skip-link": "700"
+  }
+}

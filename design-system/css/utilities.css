@@ -1,0 +1,283 @@
+/* Vellum — component classes and the handful of things a utility framework
+ * cannot express.
+ *
+ * PLAIN CSS ON PURPOSE. These are ordinary class selectors, so the system works
+ * in a project with no utility framework at all. If you are on Tailwind v4 and
+ * want variant support (`md:reading-column`, `hover:elevated`), also import
+ * `tailwind-utilities.css`, which re-exports these as `@utility`.
+ *
+ * Original note follows.
+ *
+ * Keep this file small. Anything that can be a token or a Tailwind utility
+ * should be. What lives here:
+ *   1. Multi-property state machines (the answer row) that would otherwise be
+ *      twenty conditional classes in JSX.
+ *   2. Font-feature settings Tailwind has no namespace for.
+ *   3. The reading column, which needs a measure plus serif plus leading.
+ *   4. The focus ring, defined once so it cannot drift.
+ */
+
+/* ---------------------------------------------------------------- numerals */
+
+/* Tabular figures. Apply to every timer, score, table cell and comparison.
+ * Proportional digits make a counting-down timer visibly jitter as glyph widths
+ * change, which is precisely the wrong signal for an anxious user. */
+.tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+}
+
+/* Opt back out, for prose where tabular figures look mechanical. */
+.proportional {
+  font-variant-numeric: proportional-nums;
+  font-feature-settings: 'pnum' 1;
+}
+
+/* ---------------------------------------------------------- reading column */
+
+/* The passage. Serif, 18/30, capped at 68ch. The cap is on the text, not the
+ * panel, so a split-view passage panel can be wider than its measure. */
+.reading-column {
+  font-family: var(--vlm-font-serif);
+  font-size: var(--vlm-text-passage-size);
+  line-height: var(--vlm-text-passage-leading);
+  font-weight: var(--vlm-weight-regular);
+  max-width: var(--vlm-layout-reading-measure);
+  text-wrap: pretty;
+  hanging-punctuation: first last;
+}
+
+/* ------------------------------------------------------------- focus ring */
+
+/* One definition. Never override, never remove. `:focus-visible` so a mouse
+ * click on an answer row does not paint a ring the user did not ask for. */
+.focus-ring:focus-visible {
+  outline: var(--vlm-size-focus-ring-width) solid var(--vlm-focus-ring);
+  outline-offset: var(--vlm-size-focus-ring-offset);
+  border-radius: inherit;
+}
+
+/* For a control whose ring would be clipped by an ancestor's overflow. */
+.focus-ring-inset:focus-visible {
+  outline: var(--vlm-size-focus-ring-width) solid var(--vlm-focus-ring);
+  outline-offset: calc(var(--vlm-size-focus-ring-offset) * -1);
+  border-radius: inherit;
+}
+
+/* ---------------------------------------------------------- the answer row */
+
+/* The most important component in the product, so its state machine is one
+ * place rather than a conditional class soup.
+ *
+ * Structure the markup must provide:
+ *   <li>
+ *     <label class="vlm-answer" data-state="unselected|selected|correct|
+ *                                           incorrect|revealed|skipped">
+ *       <input type="radio|checkbox" class="vlm-answer__input">
+ *       <span class="vlm-answer__letter">A</span>
+ *       <span class="vlm-answer__body">…</span>
+ *       <span class="vlm-answer__mark">…icon + visually-hidden text…</span>
+ *     </label>
+ *   </li>
+ *
+ * Only `background-color`, `border-color`, `color` and `box-shadow` transition.
+ * No geometry animates, so the row never reflows and never nudges the text the
+ * user is reading. */
+.vlm-answer {
+  --answer-bg: var(--vlm-surface-raised);
+  --answer-border: var(--vlm-border-interactive);
+  --answer-fg: var(--vlm-text-primary);
+  --answer-mark: var(--vlm-text-tertiary);
+  --answer-ring: 0 0 0 0 transparent;
+
+  display: grid;
+  grid-template-columns: var(--vlm-space-6) 1fr auto;
+  align-items: start;
+  gap: var(--vlm-space-3);
+  width: 100%;
+  min-height: var(--vlm-size-answer-row-min);
+  padding: var(--vlm-space-4);
+  border: 1px solid var(--answer-border);
+  border-radius: var(--vlm-radius-lg);
+  background-color: var(--answer-bg);
+  color: var(--answer-fg);
+  box-shadow: var(--answer-ring);
+  cursor: pointer;
+  text-align: left;
+
+  /* Answer text never drops below 16px, on any breakpoint. */
+  font-size: var(--vlm-text-body-size);
+  line-height: var(--vlm-text-body-leading);
+
+  transition:
+    background-color var(--vlm-duration-fast) var(--vlm-ease-out),
+    border-color var(--vlm-duration-fast) var(--vlm-ease-out),
+    color var(--vlm-duration-fast) var(--vlm-ease-out),
+    box-shadow var(--vlm-duration-fast) var(--vlm-ease-out);
+}
+
+/* Hover says "selectable", not "selected": the surface lifts, the border stays
+ * neutral. A fast mouse can never confuse this with the indigo selected state. */
+@media (hover: hover) {
+  .vlm-answer[data-state='unselected']:hover {
+    --answer-bg: var(--vlm-surface-sunken);
+    --answer-border: var(--vlm-border-strong);
+  }
+}
+
+.vlm-answer[data-state='selected'] {
+  --answer-bg: var(--vlm-action-subtle);
+  --answer-border: var(--vlm-action-border);
+  --answer-mark: var(--vlm-action);
+  /* Second border ring rather than a wider border, so nothing reflows. */
+  --answer-ring: inset 0 0 0 1px var(--vlm-action-border);
+}
+
+@media (hover: hover) {
+  .vlm-answer[data-state='selected']:hover {
+    --answer-bg: var(--vlm-action-subtle-hover);
+  }
+}
+
+.vlm-answer[data-state='correct'] {
+  --answer-bg: var(--vlm-answer-correct-bg);
+  --answer-border: var(--vlm-answer-correct-border);
+  --answer-mark: var(--vlm-answer-correct-fg);
+  --answer-ring: inset 0 0 0 1px var(--vlm-answer-correct-border);
+}
+
+.vlm-answer[data-state='incorrect'] {
+  --answer-bg: var(--vlm-answer-incorrect-bg);
+  --answer-border: var(--vlm-answer-incorrect-border);
+  --answer-mark: var(--vlm-answer-incorrect-fg);
+  --answer-ring: inset 0 0 0 1px var(--vlm-answer-incorrect-border);
+}
+
+/* The right answer the user did not pick. Deliberately quieter than `correct`:
+ * dashed edge, no inner ring, so it reads as "this was the answer" rather than
+ * competing with the row the user actually chose. */
+.vlm-answer[data-state='revealed'] {
+  --answer-bg: var(--vlm-answer-correct-bg);
+  --answer-border: var(--vlm-answer-correct-border);
+  --answer-mark: var(--vlm-answer-correct-fg);
+  border-style: dashed;
+}
+
+.vlm-answer[data-state='skipped'] {
+  --answer-bg: var(--vlm-answer-skipped-bg);
+  --answer-border: var(--vlm-answer-skipped-border);
+  --answer-mark: var(--vlm-answer-skipped-fg);
+}
+
+/* After submit the row is inert but must stay legible — never dim it to the
+ * point that the user cannot read what they got wrong. */
+.vlm-answer[aria-disabled='true'],
+.vlm-answer:has(.vlm-answer__input:disabled) {
+  cursor: default;
+}
+
+.vlm-answer:has(.vlm-answer__input:focus-visible) {
+  outline: var(--vlm-size-focus-ring-width) solid var(--vlm-focus-ring);
+  outline-offset: var(--vlm-size-focus-ring-offset);
+}
+
+/* The native control is the accessibility tree; the visual indicator is drawn
+ * by ::before on the letter slot. Do not replace with role="radio" on a div. */
+.vlm-answer__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Fixed-width leading slot keeps A–E aligned whether the choice is two words
+ * or three lines. */
+.vlm-answer__letter {
+  display: grid;
+  place-items: center;
+  width: var(--vlm-space-6);
+  height: var(--vlm-space-6);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--vlm-weight-semibold);
+  font-size: var(--vlm-text-body-sm-size);
+  color: var(--answer-mark);
+  border: 1px solid currentColor;
+  /* Circle for single-select, rounded square for multi-select. The shape is the
+   * at-a-glance signal for which interaction model applies. */
+  border-radius: var(--vlm-radius-full);
+}
+
+.vlm-answer[data-select='multi'] .vlm-answer__letter {
+  border-radius: var(--vlm-radius-sm);
+}
+
+.vlm-answer[data-state='selected'] .vlm-answer__letter,
+.vlm-answer[data-state='correct'] .vlm-answer__letter,
+.vlm-answer[data-state='incorrect'] .vlm-answer__letter {
+  background-color: var(--answer-mark);
+  color: var(--vlm-surface-raised);
+}
+
+.vlm-answer__body {
+  min-width: 0;
+  padding-block-start: 2px;
+}
+
+/* Correctness is icon + text + colour. The icon lives here; the text label is
+ * in a visually-hidden span inside it. Never colour alone. */
+.vlm-answer__mark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vlm-space-1);
+  color: var(--answer-mark);
+  font-size: var(--vlm-text-caption-size);
+  font-weight: var(--vlm-weight-semibold);
+  padding-block-start: 4px;
+}
+
+/* --------------------------------------------------------------- elevation */
+
+/* Dark mode swaps shadow for a lightened border, because a soft shadow on a
+ * dark surface reads as haze rather than as lift. */
+.elevated {
+  background-color: var(--vlm-surface-raised);
+  border: 1px solid var(--vlm-elevation-raised-border);
+  border-radius: var(--vlm-radius-lg);
+  box-shadow: var(--vlm-elevation-raised);
+}
+
+.elevated-overlay {
+  background-color: var(--vlm-surface-overlay);
+  border: 1px solid var(--vlm-elevation-overlay-border);
+  border-radius: var(--vlm-radius-xl);
+  box-shadow: var(--vlm-elevation-overlay);
+}
+
+/* ------------------------------------------------------------ screen reader */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ------------------------------------------------------------ vertical rhythm */
+
+/* 24 between siblings, 40 between sections, 64 before a page divider. */
+.flow > * + * {
+    margin-block-start: var(--vlm-space-5);
+}
+
+.flow-section > * + * {
+    margin-block-start: var(--vlm-space-7);
+}

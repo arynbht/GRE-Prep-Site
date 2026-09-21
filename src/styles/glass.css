@@ -1,0 +1,185 @@
+/* Glassmorphism surface layer.
+ *
+ * From the UI/UX Pro Max design system: backdrop blur 10-20px, 1px rgba-white
+ * border, light reflection, z-depth.
+ *
+ * SCOPED TO PRE-TEST SURFACES. Landing, auth, dashboard, import, setup and
+ * history get glass. The question screen does not: translucency over a moving
+ * scroll position is exactly the wrong thing behind a passage someone is
+ * reading against a clock.
+ */
+
+/* ---------------------------------------------------------------- typography
+ * Plus Jakarta Sans for UI, per the skill's font pairing. Literata stays on
+ * passages: the skill has nothing to say about long-form reading, and dropping
+ * the reading serif would be a regression rather than an instruction. */
+
+:root {
+  --vlm-font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ------------------------------------------------------------ ambient field
+ *
+ * Glass is invisible on a flat fill — it needs something behind it to refract.
+ * Two soft radial washes in the brand primary and accent give the blur
+ * something to work with without turning into a consumer gradient poster.
+ *
+ * `position: fixed` so it does not repaint on scroll, and `pointer-events: none`
+ * so it never eats a click. */
+
+.glass-field {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(52rem 32rem at 12% -8%, rgb(37 99 235 / 0.14), transparent 60%),
+    radial-gradient(40rem 28rem at 92% 4%, rgb(234 88 12 / 0.10), transparent 62%),
+    radial-gradient(44rem 34rem at 68% 96%, rgb(59 130 246 / 0.10), transparent 60%);
+}
+
+[data-theme='dark'] .glass-field {
+  background:
+    radial-gradient(52rem 32rem at 12% -8%, rgb(59 130 246 / 0.20), transparent 60%),
+    radial-gradient(40rem 28rem at 92% 4%, rgb(234 88 12 / 0.13), transparent 62%),
+    radial-gradient(44rem 34rem at 68% 96%, rgb(37 99 235 / 0.16), transparent 60%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .glass-field {
+    background:
+      radial-gradient(52rem 32rem at 12% -8%, rgb(59 130 246 / 0.20), transparent 60%),
+      radial-gradient(40rem 28rem at 92% 4%, rgb(234 88 12 / 0.13), transparent 62%),
+      radial-gradient(44rem 34rem at 68% 96%, rgb(37 99 235 / 0.16), transparent 60%);
+  }
+}
+
+/* ----------------------------------------------------------------- the panel
+ *
+ * The sheen is a ::before rather than a second background layer so it sits
+ * above the blur and reads as a light source catching an edge. */
+
+.glass {
+  position: relative;
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--vlm-radius-lg);
+  box-shadow:
+    0 1px 0 0 var(--glass-border) inset,
+    0 8px 24px -12px var(--glass-edge),
+    0 2px 6px -2px var(--glass-edge);
+  overflow: hidden;
+}
+
+/* backdrop-filter is the expensive part, so it is applied only where supported
+ * and only on the panel itself, never on a scrolling ancestor. */
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .glass {
+    background: var(--glass-surface);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  }
+}
+
+/* Without backdrop-filter the panel would be a washed-out translucent box, so
+ * it falls back to an opaque card. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--vlm-surface-raised);
+  }
+}
+
+.glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--glass-sheen);
+  pointer-events: none;
+}
+
+.glass > * {
+  position: relative;
+}
+
+.glass-strong {
+  background: var(--glass-surface-strong);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .glass-strong {
+    -webkit-backdrop-filter: blur(var(--glass-blur-strong)) saturate(150%);
+    backdrop-filter: blur(var(--glass-blur-strong)) saturate(150%);
+  }
+}
+
+/* A raised, interactive panel. Lift is transform-only so nothing reflows. */
+.glass-interactive {
+  transition:
+    transform var(--vlm-duration-base) var(--vlm-ease-out),
+    box-shadow var(--vlm-duration-base) var(--vlm-ease-out),
+    border-color var(--vlm-duration-base) var(--vlm-ease-out);
+}
+
+@media (hover: hover) {
+  .glass-interactive:hover {
+    transform: translateY(-2px);
+    border-color: var(--vlm-action-border);
+    box-shadow:
+      0 1px 0 0 var(--glass-border) inset,
+      0 16px 32px -16px var(--glass-edge),
+      0 4px 10px -4px var(--glass-edge);
+  }
+}
+
+/* --------------------------------------------------------------- top bar
+ * Sticky, so it must be the strong variant or text behind it shows through. */
+
+.glass-bar {
+  background: var(--glass-surface-strong);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .glass-bar {
+    -webkit-backdrop-filter: blur(var(--glass-blur-strong)) saturate(150%);
+    backdrop-filter: blur(var(--glass-blur-strong)) saturate(150%);
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-bar {
+    background: var(--vlm-surface-raised);
+  }
+}
+
+/* ------------------------------------------------------------ scroll reveal
+ *
+ * The skill's Subtle tier: 350ms, small y offset, fade-led. Implemented with
+ * IntersectionObserver rather than GSAP + ScrollTrigger — same duration, same
+ * easing curve, same 12px offset, about 0.5KB instead of roughly 50KB.
+ *
+ * Elements start hidden ONLY once JS has confirmed it will observe them, via
+ * the `js-reveal` class on <html>. Without that, content that never receives an
+ * observer would stay invisible forever. */
+
+.js-reveal .reveal {
+  opacity: 0;
+  transform: translateY(var(--reveal-offset));
+  transition:
+    opacity var(--reveal-duration) var(--reveal-easing),
+    transform var(--reveal-duration) var(--reveal-easing);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.js-reveal .reveal[data-revealed='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-reveal .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

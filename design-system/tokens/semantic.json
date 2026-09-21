@@ -1,0 +1,320 @@
+{
+  "$description": "Vellum semantic layer. This is the ONLY layer a component may reference. Every token exists in both themes under the same name. `{a.b.c}` resolves against primitives.json; `{ mix }` blends a tint into a surface at build time rather than at runtime, so the value is a static hex that can be contrast-checked and does not depend on color-mix() support.",
+
+  "$themes": ["light", "dark"],
+
+  "color": {
+    "surface": {
+      "$type": "color",
+      "$description": "The page itself.",
+      "light": "{color.neutral.50}",
+      "dark": "{color.neutral.900}"
+    },
+    "surface-raised": {
+      "$type": "color",
+      "$description": "Cards, answer rows, popovers. Sits above surface.",
+      "light": "{color.neutral.0}",
+      "dark": "{color.neutral.850}"
+    },
+    "surface-sunken": {
+      "$type": "color",
+      "$description": "Wells, passage background, code blocks, inactive navigator cells.",
+      "light": "{color.neutral.100}",
+      "dark": "{color.neutral.950}"
+    },
+    "surface-overlay": {
+      "$type": "color",
+      "$description": "Modals and bottom sheets.",
+      "light": "{color.neutral.0}",
+      "dark": "{color.neutral.850}"
+    },
+    "surface-scrim": {
+      "$type": "color",
+      "$description": "Backdrop behind a modal. Alpha on purpose.",
+      "light": "rgb(21 24 31 / 0.40)",
+      "dark": "rgb(12 14 19 / 0.64)"
+    },
+
+    "border-subtle": {
+      "$type": "color",
+      "$description": "Dividers and card edges. Decorative, not required to meet 3:1.",
+      "light": "{color.neutral.200}",
+      "dark": "{color.neutral.800}"
+    },
+    "border-strong": {
+      "$type": "color",
+      "$description": "Input and control edges. WCAG 1.4.11 applies, so this must clear 3:1 against the surface behind it. neutral-400 (light) and neutral-600 (dark) both failed that; neutral-500 clears it in both themes.",
+      "light": "{color.neutral.500}",
+      "dark": "{color.neutral.500}"
+    },
+    "border-interactive": {
+      "$type": "color",
+      "$description": "Resting border on an unselected answer row or control.",
+      "light": "{color.neutral.300}",
+      "dark": "{color.neutral.700}"
+    },
+
+    "text-primary": {
+      "$type": "color",
+      "light": "{color.neutral.900}",
+      "dark": "{color.neutral.50}"
+    },
+    "text-secondary": {
+      "$type": "color",
+      "light": "{color.neutral.600}",
+      "dark": "{color.neutral.300}"
+    },
+    "text-tertiary": {
+      "$type": "color",
+      "$description": "Metadata and captions only. Never body copy.",
+      "light": "{color.neutral.500}",
+      "dark": "{color.neutral.400}"
+    },
+    "text-inverse": {
+      "$type": "color",
+      "light": "{color.neutral.0}",
+      "dark": "{color.neutral.900}"
+    },
+    "text-link": {
+      "$type": "color",
+      "light": "{color.indigo.700}",
+      "dark": "{color.indigo.300}"
+    },
+
+    "action": {
+      "$type": "color",
+      "$description": "Default interactive colour. Indigo 600 light / 300 dark.",
+      "light": "{color.indigo.600}",
+      "dark": "{color.indigo.300}"
+    },
+    "action-hover": {
+      "$type": "color",
+      "light": "{color.indigo.700}",
+      "dark": "{color.indigo.200}"
+    },
+    "action-pressed": {
+      "$type": "color",
+      "light": "{color.indigo.800}",
+      "dark": "{color.indigo.100}"
+    },
+    "action-subtle": {
+      "$type": "color",
+      "$description": "Tinted fill for selected rows and secondary emphasis.",
+      "light": "{color.indigo.50}",
+      "dark": { "mix": ["{color.indigo.300}", "{color.neutral.900}"], "amount": 0.14 }
+    },
+    "action-subtle-hover": {
+      "$type": "color",
+      "light": "{color.indigo.100}",
+      "dark": { "mix": ["{color.indigo.300}", "{color.neutral.900}"], "amount": 0.2 }
+    },
+    "action-border": {
+      "$type": "color",
+      "light": "{color.indigo.600}",
+      "dark": "{color.indigo.400}"
+    },
+    "on-action": {
+      "$type": "color",
+      "$description": "Text and icons on a filled action surface.",
+      "light": "{color.neutral.0}",
+      "dark": "{color.neutral.900}"
+    },
+    "focus-ring": {
+      "$type": "color",
+      "$description": "Must be visible on every surface, including inside a filled answer row.",
+      "light": "{color.indigo.600}",
+      "dark": "{color.indigo.300}"
+    },
+
+    "accent": {
+      "$type": "color",
+      "$description": "Amber. Progress, streaks, milestones. NEVER a primary action.",
+      "light": "{color.amber.600}",
+      "dark": "{color.amber.300}"
+    },
+    "accent-text": {
+      "$type": "color",
+      "$description": "Amber as TEXT. Separate from `accent` because amber-600 measures 3.62:1 on white, which passes for a graphic and fails for a label.",
+      "light": "{color.amber.700}",
+      "dark": "{color.amber.300}"
+    },
+    "accent-strong": {
+      "$type": "color",
+      "light": "{color.amber.500}",
+      "dark": "{color.amber.400}"
+    },
+    "accent-subtle": {
+      "$type": "color",
+      "light": "{color.amber.50}",
+      "dark": { "mix": ["{color.amber.300}", "{color.neutral.900}"], "amount": 0.14 }
+    },
+    "on-accent": {
+      "$type": "color",
+      "light": "{color.neutral.900}",
+      "dark": "{color.neutral.900}"
+    },
+
+    "answer-correct-fg": {
+      "$type": "color",
+      "light": "{color.green.700}",
+      "dark": "{color.green.300}"
+    },
+    "answer-correct-bg": {
+      "$type": "color",
+      "light": "{color.green.50}",
+      "dark": { "mix": ["{color.green.300}", "{color.neutral.900}"], "amount": 0.14 }
+    },
+    "answer-correct-border": {
+      "$type": "color",
+      "light": "{color.green.200}",
+      "dark": { "mix": ["{color.green.300}", "{color.neutral.900}"], "amount": 0.34 }
+    },
+
+    "answer-incorrect-fg": {
+      "$type": "color",
+      "$description": "DEVIATION from the brief, which specified #FDA29B for dark. That value is red-300 and is byte-identical to dark error-fg, which breaks the rule that answer feedback and system status must never be confusable. rose-300 keeps incorrect in the rose family in both themes. To revert, set dark to {color.red.300} and expect the build to report a collision. See docs/01-color.md.",
+      "light": "{color.rose.700}",
+      "dark": "{color.rose.300}"
+    },
+    "answer-incorrect-bg": {
+      "$type": "color",
+      "light": "{color.rose.50}",
+      "dark": { "mix": ["{color.rose.400}", "{color.neutral.900}"], "amount": 0.14 }
+    },
+    "answer-incorrect-border": {
+      "$type": "color",
+      "light": "{color.rose.200}",
+      "dark": { "mix": ["{color.rose.400}", "{color.neutral.900}"], "amount": 0.34 }
+    },
+
+    "answer-skipped-fg": {
+      "$type": "color",
+      "$description": "neutral-600 rather than 500: 500 measures 4.28:1 on the skipped tint.",
+      "light": "{color.neutral.600}",
+      "dark": "{color.neutral.400}"
+    },
+    "answer-skipped-bg": {
+      "$type": "color",
+      "light": "{color.neutral.100}",
+      "dark": { "mix": ["{color.neutral.400}", "{color.neutral.900}"], "amount": 0.1 }
+    },
+    "answer-skipped-border": {
+      "$type": "color",
+      "light": "{color.neutral.300}",
+      "dark": "{color.neutral.700}"
+    },
+
+    "answer-marked-fg": {
+      "$type": "color",
+      "$description": "amber-700 rather than 600: 600 measures 3.47:1 on the marked tint.",
+      "light": "{color.amber.700}",
+      "dark": "{color.amber.300}"
+    },
+    "answer-marked-bg": {
+      "$type": "color",
+      "light": "{color.amber.50}",
+      "dark": { "mix": ["{color.amber.300}", "{color.neutral.900}"], "amount": 0.14 }
+    },
+    "answer-marked-border": {
+      "$type": "color",
+      "light": "{color.amber.200}",
+      "dark": { "mix": ["{color.amber.300}", "{color.neutral.900}"], "amount": 0.34 }
+    },
+
+    "success-fg": {
+      "$type": "color",
+      "light": "{color.teal.600}",
+      "dark": "{color.teal.300}"
+    },
+    "success-bg": {
+      "$type": "color",
+      "light": "{color.teal.50}",
+      "dark": { "mix": ["{color.teal.300}", "{color.neutral.900}"], "amount": 0.14 }
+    },
+    "success-border": {
+      "$type": "color",
+      "light": "{color.teal.200}",
+      "dark": { "mix": ["{color.teal.300}", "{color.neutral.900}"], "amount": 0.34 }
+    },
+
+    "warning-fg": {
+      "$type": "color",
+      "light": "{color.amber.700}",
+      "dark": "{color.amber.300}"
+    },
+    "warning-bg": {
+      "$type": "color",
+      "light": "{color.amber.50}",
+      "dark": { "mix": ["{color.amber.300}", "{color.neutral.900}"], "amount": 0.14 }
+    },
+    "warning-border": {
+      "$type": "color",
+      "light": "{color.amber.200}",
+      "dark": { "mix": ["{color.amber.300}", "{color.neutral.900}"], "amount": 0.34 }
+    },
+
+    "error-fg": {
+      "$type": "color",
+      "light": "{color.red.700}",
+      "dark": "{color.red.300}"
+    },
+    "error-bg": {
+      "$type": "color",
+      "light": "{color.red.50}",
+      "dark": { "mix": ["{color.red.300}", "{color.neutral.900}"], "amount": 0.14 }
+    },
+    "error-border": {
+      "$type": "color",
+      "light": "{color.red.200}",
+      "dark": { "mix": ["{color.red.300}", "{color.neutral.900}"], "amount": 0.34 }
+    },
+
+    "info-fg": {
+      "$type": "color",
+      "light": "{color.blue.600}",
+      "dark": "{color.blue.300}"
+    },
+    "info-bg": {
+      "$type": "color",
+      "light": "{color.blue.50}",
+      "dark": { "mix": ["{color.blue.300}", "{color.neutral.900}"], "amount": 0.14 }
+    },
+    "info-border": {
+      "$type": "color",
+      "light": "{color.blue.200}",
+      "dark": { "mix": ["{color.blue.300}", "{color.neutral.900}"], "amount": 0.34 }
+    },
+
+    "timer-calm-fg": {
+      "$type": "color",
+      "$description": "Timer escalates by weight and icon, not by fill. Calm is indistinguishable from ordinary metadata on purpose.",
+      "light": "{color.neutral.600}",
+      "dark": "{color.neutral.300}"
+    },
+    "timer-warning-fg": {
+      "$type": "color",
+      "light": "{color.amber.700}",
+      "dark": "{color.amber.300}"
+    },
+    "timer-urgent-fg": {
+      "$type": "color",
+      "light": "{color.rose.700}",
+      "dark": "{color.rose.300}"
+    }
+  },
+
+  "elevation": {
+    "raised": { "light": "{shadow.1}", "dark": "none" },
+    "overlay": { "light": "{shadow.3}", "dark": "none" },
+    "modal": { "light": "{shadow.4}", "dark": "none" },
+    "raised-border": {
+      "$description": "Dark mode substitutes a lightened border for shadow.",
+      "light": "{color.neutral.200}",
+      "dark": "{color.neutral.800}"
+    },
+    "overlay-border": {
+      "light": "{color.neutral.200}",
+      "dark": "{color.neutral.700}"
+    }
+  }
+}

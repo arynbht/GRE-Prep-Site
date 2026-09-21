@@ -1,0 +1,217 @@
+/* Vellum — Tailwind v4 theme.
+ *
+ * This file maps the semantic tokens into Tailwind's namespaces so that
+ * `bg-surface-raised`, `text-secondary`, `rounded-lg`, `p-5` and so on resolve
+ * to tokens rather than to Tailwind's stock palette.
+ *
+ * Load order matters:
+ *   @import "./tokens.css";     generated primitives + semantic
+ *   @import "tailwindcss";
+ *   @import "./theme.css";      this file
+ *   @import "./utilities.css";  what Tailwind cannot express
+ *
+ * Deliberate omissions: Tailwind's default color palette, default spacing scale
+ * and default radius scale are all cleared. If a utility does not exist here it
+ * is not in the system, which is the point — `bg-blue-500` should fail loudly
+ * rather than quietly shipping an off-system colour.
+ */
+
+@theme {
+  /* Clear stock scales so only Vellum values are reachable. */
+  --color-*: initial;
+  --spacing-*: initial;
+  --radius-*: initial;
+  --font-*: initial;
+  --text-*: initial;
+  --shadow-*: initial;
+  --ease-*: initial;
+  --breakpoint-*: initial;
+
+  /* ---------------------------------------------------------------- colour
+   * Semantic only. Primitives are intentionally NOT exposed as utilities. */
+  --color-surface: var(--vlm-surface);
+  --color-surface-raised: var(--vlm-surface-raised);
+  --color-surface-sunken: var(--vlm-surface-sunken);
+  --color-surface-overlay: var(--vlm-surface-overlay);
+  --color-surface-scrim: var(--vlm-surface-scrim);
+
+  --color-border-subtle: var(--vlm-border-subtle);
+  --color-border-strong: var(--vlm-border-strong);
+  --color-border-interactive: var(--vlm-border-interactive);
+
+  --color-primary: var(--vlm-text-primary);
+  --color-secondary: var(--vlm-text-secondary);
+  --color-tertiary: var(--vlm-text-tertiary);
+  --color-inverse: var(--vlm-text-inverse);
+  --color-link: var(--vlm-text-link);
+
+  --color-action: var(--vlm-action);
+  --color-action-hover: var(--vlm-action-hover);
+  --color-action-pressed: var(--vlm-action-pressed);
+  --color-action-subtle: var(--vlm-action-subtle);
+  --color-action-subtle-hover: var(--vlm-action-subtle-hover);
+  --color-action-border: var(--vlm-action-border);
+  --color-on-action: var(--vlm-on-action);
+  --color-focus-ring: var(--vlm-focus-ring);
+
+  --color-accent: var(--vlm-accent);
+  --color-accent-text: var(--vlm-accent-text);
+  --color-accent-strong: var(--vlm-accent-strong);
+  --color-accent-subtle: var(--vlm-accent-subtle);
+  --color-on-accent: var(--vlm-on-accent);
+
+  --color-correct: var(--vlm-answer-correct-fg);
+  --color-correct-bg: var(--vlm-answer-correct-bg);
+  --color-correct-border: var(--vlm-answer-correct-border);
+  --color-incorrect: var(--vlm-answer-incorrect-fg);
+  --color-incorrect-bg: var(--vlm-answer-incorrect-bg);
+  --color-incorrect-border: var(--vlm-answer-incorrect-border);
+  --color-skipped: var(--vlm-answer-skipped-fg);
+  --color-skipped-bg: var(--vlm-answer-skipped-bg);
+  --color-skipped-border: var(--vlm-answer-skipped-border);
+  --color-marked: var(--vlm-answer-marked-fg);
+  --color-marked-bg: var(--vlm-answer-marked-bg);
+  --color-marked-border: var(--vlm-answer-marked-border);
+
+  --color-success: var(--vlm-success-fg);
+  --color-success-bg: var(--vlm-success-bg);
+  --color-success-border: var(--vlm-success-border);
+  --color-warning: var(--vlm-warning-fg);
+  --color-warning-bg: var(--vlm-warning-bg);
+  --color-warning-border: var(--vlm-warning-border);
+  --color-error: var(--vlm-error-fg);
+  --color-error-bg: var(--vlm-error-bg);
+  --color-error-border: var(--vlm-error-border);
+  --color-info: var(--vlm-info-fg);
+  --color-info-bg: var(--vlm-info-bg);
+  --color-info-border: var(--vlm-info-border);
+
+  --color-timer-calm: var(--vlm-timer-calm-fg);
+  --color-timer-warning: var(--vlm-timer-warning-fg);
+  --color-timer-urgent: var(--vlm-timer-urgent-fg);
+
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* --------------------------------------------------------------- spacing
+   * Named by step, not by px, so `p-5` is always 24px and never drifts. */
+  --spacing-0: var(--vlm-space-0);
+  --spacing-1: var(--vlm-space-1);
+  --spacing-2: var(--vlm-space-2);
+  --spacing-3: var(--vlm-space-3);
+  --spacing-4: var(--vlm-space-4);
+  --spacing-5: var(--vlm-space-5);
+  --spacing-6: var(--vlm-space-6);
+  --spacing-7: var(--vlm-space-7);
+  --spacing-8: var(--vlm-space-8);
+  --spacing-9: var(--vlm-space-9);
+  --spacing-10: var(--vlm-space-10);
+  --spacing-11: var(--vlm-space-11);
+
+  /* ---------------------------------------------------------------- radius */
+  --radius-sm: var(--vlm-radius-sm);
+  --radius-md: var(--vlm-radius-md);
+  --radius-lg: var(--vlm-radius-lg);
+  --radius-xl: var(--vlm-radius-xl);
+  --radius-full: var(--vlm-radius-full);
+
+  /* ------------------------------------------------------------ typography */
+  --font-sans: var(--vlm-font-sans);
+  --font-serif: var(--vlm-font-serif);
+  --font-mono: var(--vlm-font-mono);
+  --font-math: var(--vlm-font-math);
+
+  --text-display: var(--vlm-text-display-size);
+  --text-display--line-height: var(--vlm-text-display-leading);
+  --text-display--font-weight: var(--vlm-weight-semibold);
+  --text-display--letter-spacing: var(--vlm-tracking-tighter);
+
+  --text-h1: var(--vlm-text-h1-size);
+  --text-h1--line-height: var(--vlm-text-h1-leading);
+  --text-h1--font-weight: var(--vlm-weight-semibold);
+  --text-h1--letter-spacing: var(--vlm-tracking-tighter);
+
+  --text-h2: var(--vlm-text-h2-size);
+  --text-h2--line-height: var(--vlm-text-h2-leading);
+  --text-h2--font-weight: var(--vlm-weight-semibold);
+  --text-h2--letter-spacing: var(--vlm-tracking-tight);
+
+  --text-h3: var(--vlm-text-h3-size);
+  --text-h3--line-height: var(--vlm-text-h3-leading);
+  --text-h3--font-weight: var(--vlm-weight-semibold);
+  --text-h3--letter-spacing: var(--vlm-tracking-tight);
+
+  --text-h4: var(--vlm-text-h4-size);
+  --text-h4--line-height: var(--vlm-text-h4-leading);
+  --text-h4--font-weight: var(--vlm-weight-semibold);
+
+  --text-passage: var(--vlm-text-passage-size);
+  --text-passage--line-height: var(--vlm-text-passage-leading);
+  --text-passage--font-weight: var(--vlm-weight-regular);
+
+  --text-body: var(--vlm-text-body-size);
+  --text-body--line-height: var(--vlm-text-body-leading);
+  --text-body--font-weight: var(--vlm-weight-regular);
+
+  --text-body-sm: var(--vlm-text-body-sm-size);
+  --text-body-sm--line-height: var(--vlm-text-body-sm-leading);
+  --text-body-sm--font-weight: var(--vlm-weight-regular);
+
+  --text-caption: var(--vlm-text-caption-size);
+  --text-caption--line-height: var(--vlm-text-caption-leading);
+  --text-caption--font-weight: var(--vlm-weight-medium);
+  --text-caption--letter-spacing: var(--vlm-tracking-wide);
+
+  --text-overline: var(--vlm-text-overline-size);
+  --text-overline--line-height: var(--vlm-text-overline-leading);
+  --text-overline--font-weight: var(--vlm-weight-semibold);
+  --text-overline--letter-spacing: var(--vlm-tracking-wider);
+
+  --font-weight-regular: var(--vlm-weight-regular);
+  --font-weight-medium: var(--vlm-weight-medium);
+  --font-weight-semibold: var(--vlm-weight-semibold);
+  --font-weight-bold: var(--vlm-weight-bold);
+
+  /* --------------------------------------------------------------- shadow
+   * Dark mode resolves these to `none`; elevation there is a border. */
+  --shadow-raised: var(--vlm-elevation-raised);
+  --shadow-overlay: var(--vlm-elevation-overlay);
+  --shadow-modal: var(--vlm-elevation-modal);
+
+  /* --------------------------------------------------------------- motion */
+  --ease-out: var(--vlm-ease-out);
+  --ease-in: var(--vlm-ease-in);
+  --ease-in-out: var(--vlm-ease-in-out);
+  --ease-spring: var(--vlm-ease-spring);
+
+  /* ----------------------------------------------------------- breakpoints
+   * LITERAL, not var(). A media query cannot resolve a custom property, so
+   * `--breakpoint-md: var(--vlm-breakpoint-md)` compiles to a media query that
+   * never matches and silently produces no responsive utilities at all.
+   * These four values must stay in step with primitives.json by hand; the
+   * system lint asserts that they do. */
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 768px;
+  --breakpoint-md: 1024px;
+  --breakpoint-lg: 1280px;
+
+  /* ------------------------------------------------------------- container */
+  --container-content: var(--vlm-layout-max-content);
+  --container-reading: var(--vlm-layout-reading-measure);
+}
+
+/* Duration utilities. Tailwind generates `duration-<n>` from numbers, so the
+ * named tokens are declared here to keep hardcoded millisecond values out of
+ * component code. */
+@utility duration-instant {
+  transition-duration: var(--vlm-duration-instant);
+}
+@utility duration-fast {
+  transition-duration: var(--vlm-duration-fast);
+}
+@utility duration-base {
+  transition-duration: var(--vlm-duration-base);
+}
+@utility duration-slow {
+  transition-duration: var(--vlm-duration-slow);
+}

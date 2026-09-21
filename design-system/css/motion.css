@@ -1,0 +1,626 @@
+/* Vellum — motion.
+ *
+ * Rules this file holds itself to:
+ *   1. Only `transform`, `opacity`, `color`, `background-color`, `border-color`
+ *      and `box-shadow` are transitioned. The single exception is the
+ *      explanation panel, which is documented at the point of use.
+ *   2. Nothing loops while a question is on screen.
+ *   3. Every duration and easing comes from a token. No literal ms values.
+ *   4. Every interaction has a reduced-motion variant that keeps the
+ *      information and drops the movement. No state change is ever silently
+ *      dropped — a cross-fade or an instant swap replaces the transform.
+ *
+ * The global reduced-motion block is at the BOTTOM so it wins without
+ * !important. Do not move it.
+ */
+
+/* ============================================================ 1. answer rows
+ *
+ * The row's own transition lives in utilities.css so the state machine is in
+ * one place. What is here is the submit-time staging.
+ *
+ * Timing, from the moment submit is pressed:
+ *   0ms    aria-live announcement fires. Never waits on motion.
+ *   0ms    the chosen row begins its verdict transition (fast, 140ms)
+ *   90ms   the correct row begins revealing, overlapping by 50ms so the two
+ *          read as one beat rather than as a second animation
+ *   200ms  the explanation panel begins expanding (slow, 280ms)
+ *   480ms  settled
+ *
+ * The overlap is the whole trick: a wrong answer that animates, stops, then
+ * animates again reads as a scolding. One continuous beat reads as information.
+ */
+
+.vlm-answer[data-state='revealed'] {
+  transition-delay: var(--vlm-stagger-reveal);
+}
+
+/* Correct and incorrect are immediate — the user's own choice must respond
+ * without perceptible lag or the interface feels unsure of itself. */
+.vlm-answer[data-state='correct'],
+.vlm-answer[data-state='incorrect'] {
+  transition-delay: var(--vlm-stagger-none);
+}
+
+/* The verdict icon fades in rather than popping. No scale, no bounce: a wrong
+ * answer must never feel like it is being pointed at. */
+.vlm-answer__mark {
+  transition: opacity var(--vlm-duration-fast) var(--vlm-ease-out);
+}
+
+@supports (transition-behavior: allow-discrete) {
+  .vlm-answer__mark {
+    transition:
+      opacity var(--vlm-duration-fast) var(--vlm-ease-out),
+      display var(--vlm-duration-fast) allow-discrete;
+  }
+}
+
+@supports (interpolate-size: allow-keywords) or (not (interpolate-size: allow-keywords)) {
+  @starting-style {
+    .vlm-answer[data-state='correct'] .vlm-answer__mark,
+    .vlm-answer[data-state='incorrect'] .vlm-answer__mark,
+    .vlm-answer[data-state='revealed'] .vlm-answer__mark {
+      opacity: 0;
+    }
+  }
+}
+
+/* ===================================================== 2. explanation panel
+ *
+ * Variable-height content. `grid-template-rows: 0fr -> 1fr` is the technique:
+ * it is the only approach that animates to intrinsic height without measuring
+ * in JS, and it degrades to an instant open where unsupported.
+ *
+ * HONEST CAVEAT: this does animate a layout property, which the performance
+ * budget otherwise forbids. It is allowed here for three reasons — it runs only
+ * on an explicit user action, never while the user is reading a question; it is
+ * confined by `contain: layout paint` so the reflow does not escape the panel;
+ * and the alternative (animating transform on a measured height) needs JS and
+ * breaks when the content reflows at a different viewport width.
+ *
+ * Where `interpolate-size` is supported, the progressive enhancement below uses
+ * a real height transition, which is smoother still.
+ */
+
+.vlm-explanation {
+  display: grid;
+  grid-template-rows: 0fr;
+  contain: layout paint;
+  transition: grid-template-rows var(--vlm-duration-slow) var(--vlm-ease-out);
+  transition-delay: var(--vlm-stagger-explanation);
+}
+
+.vlm-explanation[data-open='true'] {
+  grid-template-rows: 1fr;
+}
+
+/* The inner element must own the overflow, or the content is clipped mid-way. */
+.vlm-explanation__inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Content fades slightly behind the expansion so text is never legible while
+ * being squashed. */
+.vlm-explanation__content {
+  opacity: 0;
+  transition: opacity var(--vlm-duration-fast) var(--vlm-ease-out);
+  transition-delay: var(--vlm-stagger-explanation-content);
+}
+
+.vlm-explanation[data-open='true'] .vlm-explanation__content {
+  opacity: 1;
+}
+
+/* Collapsing is faster than expanding and has no delay: getting out of the way
+ * should feel immediate. */
+.vlm-explanation:not([data-open='true']) {
+  transition-duration: var(--vlm-duration-base);
+  transition-delay: var(--vlm-stagger-none);
+}
+
+.vlm-explanation:not([data-open='true']) .vlm-explanation__content {
+  transition-delay: var(--vlm-stagger-none);
+}
+
+@supports (interpolate-size: allow-keywords) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+
+  .vlm-explanation {
+    display: block;
+    block-size: 0;
+    overflow: hidden;
+    transition: block-size var(--vlm-duration-slow) var(--vlm-ease-out);
+    transition-delay: var(--vlm-stagger-explanation);
+  }
+
+  .vlm-explanation[data-open='true'] {
+    block-size: auto;
+  }
+}
+
+/* ========================================================= 3. form controls
+ *
+ * Focus must be unmissable for a keyboard user and invisible to a mouse user.
+ * `:focus-visible` does that work; the transition only softens the border
+ * colour so the ring itself appears instantly.
+ */
+
+.vlm-field {
+  transition:
+    border-color var(--vlm-duration-fast) var(--vlm-ease-out),
+    background-color var(--vlm-duration-fast) var(--vlm-ease-out);
+}
+
+.vlm-field:focus-visible {
+  outline: var(--vlm-size-focus-ring-width) solid var(--vlm-focus-ring);
+  outline-offset: var(--vlm-size-focus-ring-offset);
+  border-color: var(--vlm-action-border);
+}
+
+/* Error appearance is calm: the border and the message cross-fade in. No shake,
+ * no slide. A validation message that jumps reads as an accusation. */
+.vlm-field[aria-invalid='true'] {
+  border-color: var(--vlm-error-border);
+}
+
+.vlm-field-message {
+  opacity: 0;
+  transition: opacity var(--vlm-duration-fast) var(--vlm-ease-out);
+}
+
+.vlm-field-message[data-visible='true'] {
+  opacity: 1;
+}
+
+/* ============================================================== 4. buttons
+ *
+ * Active state is a 1px optical press via transform, not via margin or top, so
+ * nothing around it reflows. 0.98 scale reads as mushy at these sizes; a
+ * translate reads as a real button.
+ */
+
+.vlm-button {
+  transition:
+    background-color var(--vlm-duration-fast) var(--vlm-ease-out),
+    border-color var(--vlm-duration-fast) var(--vlm-ease-out),
+    color var(--vlm-duration-fast) var(--vlm-ease-out),
+    transform var(--vlm-duration-instant) var(--vlm-ease-out);
+}
+
+.vlm-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Loading swaps the label for a spinner while the button keeps its exact width.
+ * The label stays in flow at opacity 0 rather than being removed, which is what
+ * preserves the width — `visibility: hidden` would work too but cannot animate. */
+.vlm-button[data-loading='true'] {
+  cursor: progress;
+}
+
+.vlm-button[data-loading='true'] .vlm-button__label {
+  opacity: 0;
+  transition: opacity var(--vlm-duration-instant) var(--vlm-ease-out);
+}
+
+.vlm-button__spinner {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity var(--vlm-duration-instant) var(--vlm-ease-out);
+}
+
+.vlm-button[data-loading='true'] .vlm-button__spinner {
+  opacity: 1;
+}
+
+/* The one permitted loop in the system, and only because a spinner that does
+ * not spin is not a spinner. It exists only while a request is in flight. */
+.vlm-button__spinner svg {
+  animation: vlm-spin 900ms linear infinite;
+}
+
+@keyframes vlm-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ======================================================== 5. skeleton swap
+ *
+ * Target CLS 0: the skeleton must match the real content's box exactly, so its
+ * metrics are set from the same tokens the content uses.
+ *
+ * RECOMMENDATION: no shimmer. A shimmering placeholder is a looping animation
+ * in the user's visual field while they wait for a question, and this product's
+ * whole posture is restraint. Static blocks read as "loading" perfectly well.
+ * The shimmer is available below as an opt-in; we do not use it in the exam
+ * flow, only on marketing surfaces.
+ */
+
+.vlm-skeleton {
+  background-color: var(--vlm-surface-sunken);
+  border-radius: var(--vlm-radius-sm);
+}
+
+.vlm-skeleton--shimmer {
+  background-image: linear-gradient(
+    90deg,
+    var(--vlm-surface-sunken) 0%,
+    var(--vlm-border-subtle) 50%,
+    var(--vlm-surface-sunken) 100%
+  );
+  background-size: 200% 100%;
+  animation: vlm-shimmer 1400ms var(--vlm-ease-in-out) infinite;
+}
+
+@keyframes vlm-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* Cross-fade skeleton to content. Both are absolutely stacked so the swap has
+ * no intermediate layout. */
+.vlm-swap {
+  display: grid;
+}
+
+.vlm-swap > * {
+  grid-area: 1 / 1;
+  transition: opacity var(--vlm-duration-base) var(--vlm-ease-out);
+}
+
+.vlm-swap[data-ready='true'] .vlm-swap__skeleton {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.vlm-swap[data-ready='false'] .vlm-swap__content {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ================================================================ 6. timer
+ *
+ * Escalation is carried by WEIGHT and ICON, with colour third. There is no
+ * pulse, no glow, no loop — a timer that moves steals attention from the
+ * question, which is the opposite of what a person under time pressure needs.
+ *
+ * The state change is perceptible because two things change at once (the glyph
+ * and the stroke weight), which the periphery detects as a change in shape even
+ * when you are not looking at it. Nothing needs to move for that to work.
+ */
+
+.vlm-timer {
+  font-variant-numeric: tabular-nums;
+  color: var(--vlm-timer-calm-fg);
+  font-weight: var(--vlm-weight-medium);
+  transition:
+    color var(--vlm-duration-fast) var(--vlm-ease-in-out),
+    background-color var(--vlm-duration-fast) var(--vlm-ease-in-out),
+    font-weight var(--vlm-duration-fast) var(--vlm-ease-in-out);
+}
+
+.vlm-timer[data-level='warning'] {
+  color: var(--vlm-timer-warning-fg);
+  background-color: var(--vlm-accent-subtle);
+  font-weight: var(--vlm-weight-semibold);
+}
+
+.vlm-timer[data-level='urgent'] {
+  color: var(--vlm-timer-urgent-fg);
+  background-color: var(--vlm-answer-incorrect-bg);
+  font-weight: var(--vlm-weight-semibold);
+}
+
+/* Hidden mode still occupies its box, so hiding the timer never reflows the
+ * top bar mid-session. */
+.vlm-timer[data-hidden='true'] .vlm-timer__value {
+  visibility: hidden;
+}
+
+/* ==================================================== 7. question navigator
+ *
+ * A cell changes state when the user answers or marks. The change is a colour
+ * swap only — 100+ cells cannot animate geometry without cost, and a grid that
+ * ripples is a distraction.
+ */
+
+.vlm-nav-cell {
+  transition:
+    background-color var(--vlm-duration-fast) var(--vlm-ease-out),
+    border-color var(--vlm-duration-fast) var(--vlm-ease-out),
+    color var(--vlm-duration-fast) var(--vlm-ease-out);
+}
+
+/* The panel itself enters with a short translate. It is a deliberate,
+ * user-initiated overlay, so movement here is orienting rather than noisy. */
+.vlm-nav-panel {
+  transform: translateY(var(--vlm-space-2));
+  opacity: 0;
+  transition:
+    transform var(--vlm-duration-base) var(--vlm-ease-out),
+    opacity var(--vlm-duration-base) var(--vlm-ease-out);
+}
+
+.vlm-nav-panel[data-open='true'] {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ============================================================ 8. flashcard
+ *
+ * 3D flip. `backface-visibility: hidden` keeps the reverse face from ghosting
+ * through, and both faces stay in flow so the card never changes size.
+ */
+
+.vlm-flashcard {
+  perspective: 1200px;
+}
+
+.vlm-flashcard__inner {
+  display: grid;
+  transform-style: preserve-3d;
+  transform: rotateY(var(--flip, 0deg));
+  transition: transform var(--vlm-duration-slow) var(--vlm-ease-in-out);
+}
+
+/* While a drag is in progress JS sets --flip directly, so the transition must
+ * be off or every frame fights the previous one. */
+.vlm-flashcard__inner[data-dragging='true'] {
+  transition: none;
+}
+
+.vlm-flashcard__face {
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.vlm-flashcard__face--back {
+  transform: rotateY(180deg);
+}
+
+/* ============================================================= 9. progress
+ *
+ * The bar animates `transform: scaleX` on an inner fill, never `width`.
+ * Because CSS transitions interpolate from the current computed value, this
+ * animates from the previous value for free — provided React does not remount
+ * the element. Keep the key stable and set the value inline; do not initialise
+ * at zero in an effect.
+ */
+
+.vlm-progress__fill {
+  transform-origin: left center;
+  transform: scaleX(var(--value, 0));
+  transition: transform var(--vlm-duration-slow) var(--vlm-ease-out);
+}
+
+/* The ring animates `stroke-dashoffset`.
+ *
+ * JUSTIFIED EXCEPTION to the transform/opacity-only rule: stroke-dashoffset
+ * triggers paint on a ~40px SVG and never triggers layout. The transform-only
+ * alternative requires two masked half-circles and breaks past 50%, which is
+ * more code and more failure modes for no measurable frame-time gain. */
+.vlm-ring__value {
+  transition: stroke-dashoffset var(--vlm-duration-slow) var(--vlm-ease-out);
+}
+
+/* ===================================================== 10. goal completion
+ *
+ * The one permitted moment of delight. 280ms for the arc to close, then a
+ * 170ms settle. 450ms total, at the ceiling and not over it.
+ *
+ * No confetti, no sound, no scale on the surrounding card. The emotion comes
+ * from the arc arriving and the ring breathing once — earned by timing, not by
+ * volume.
+ */
+
+.vlm-ring[data-celebrate='true'] .vlm-ring__value {
+  transition-duration: var(--vlm-duration-slow);
+}
+
+.vlm-ring[data-celebrate='true'] .vlm-ring__group {
+  animation: vlm-goal-settle var(--vlm-duration-settle) var(--vlm-ease-spring) var(--vlm-duration-slow) both;
+  transform-origin: center;
+}
+
+@keyframes vlm-goal-settle {
+  0% {
+    transform: scale(1);
+  }
+  55% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ================================================================ 11. toast
+ *
+ * Enters from the edge on a translate, exits by fading in place. Exiting with
+ * a translate makes a stack of toasts appear to fall apart; fading keeps the
+ * remaining stack still while one leaves.
+ */
+
+.vlm-toast {
+  transform: translateY(var(--vlm-space-3));
+  opacity: 0;
+  transition:
+    transform var(--vlm-duration-base) var(--vlm-ease-out),
+    opacity var(--vlm-duration-base) var(--vlm-ease-out);
+}
+
+.vlm-toast[data-state='entered'] {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.vlm-toast[data-state='exiting'] {
+  transform: translateY(0);
+  opacity: 0;
+  transition-duration: var(--vlm-duration-fast);
+  transition-timing-function: var(--vlm-ease-in);
+}
+
+@supports (transition-behavior: allow-discrete) {
+  @starting-style {
+    .vlm-toast[data-state='entered'] {
+      transform: translateY(var(--vlm-space-3));
+      opacity: 0;
+    }
+  }
+}
+
+/* Stack members slide up as one leaves. Transform only, so no reflow. */
+.vlm-toast-stack > * {
+  transition: transform var(--vlm-duration-base) var(--vlm-ease-in-out);
+}
+
+/* ============================================================= 12. overlays */
+
+.vlm-scrim {
+  opacity: 0;
+  transition: opacity var(--vlm-duration-base) var(--vlm-ease-out);
+}
+
+.vlm-scrim[data-open='true'] {
+  opacity: 1;
+}
+
+.vlm-sheet {
+  transform: translateY(100%);
+  transition: transform var(--vlm-duration-slow) var(--vlm-ease-out);
+}
+
+.vlm-sheet[data-open='true'] {
+  transform: translateY(0);
+}
+
+.vlm-modal {
+  opacity: 0;
+  transform: scale(0.98);
+  transition:
+    opacity var(--vlm-duration-base) var(--vlm-ease-out),
+    transform var(--vlm-duration-base) var(--vlm-ease-out);
+}
+
+.vlm-modal[data-open='true'] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ==================================================== reduced motion (last)
+ *
+ * Every rule below removes movement while KEEPING the state change. Nothing
+ * here drops a transition to `none` on a property that carries meaning — a
+ * colour change still cross-fades, because an instant colour swap on a large
+ * surface is itself a jarring flash.
+ */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Transforms become instant everywhere. */
+  .vlm-button:active:not(:disabled),
+  .vlm-nav-panel,
+  .vlm-toast,
+  .vlm-sheet,
+  .vlm-modal,
+  .vlm-flashcard__inner {
+    transform: none !important;
+    transition-property: opacity;
+    transition-duration: var(--vlm-duration-fast);
+  }
+
+  .vlm-nav-panel[data-open='true'],
+  .vlm-toast[data-state='entered'],
+  .vlm-sheet[data-open='true'],
+  .vlm-modal[data-open='true'] {
+    opacity: 1;
+  }
+
+  /* The flip becomes a cross-fade between faces. Both faces must be visible to
+   * the compositor, so backface-visibility is released. */
+  .vlm-flashcard__face {
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+    transition: opacity var(--vlm-duration-fast) var(--vlm-ease-out);
+  }
+
+  .vlm-flashcard[data-face='front'] .vlm-flashcard__face--back,
+  .vlm-flashcard[data-face='back'] .vlm-flashcard__face--front {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .vlm-flashcard__face--back {
+    transform: none;
+  }
+
+  /* The panel opens instantly. The content still fades so text does not appear
+   * mid-reflow. */
+  .vlm-explanation {
+    transition: none;
+    transition-delay: var(--vlm-stagger-none);
+  }
+
+  .vlm-explanation__content {
+    transition-delay: var(--vlm-stagger-none);
+  }
+
+  /* Progress jumps to its value rather than sweeping. The number beside it is
+   * the real information and is unaffected. */
+  .vlm-progress__fill,
+  .vlm-ring__value {
+    transition: none;
+  }
+
+  /* The celebration keeps its colour change and drops the settle entirely. */
+  .vlm-ring[data-celebrate='true'] .vlm-ring__group {
+    animation: none;
+  }
+
+  /* The spinner stops rotating; the button still reads as busy via
+   * aria-busy and the disabled state. */
+  .vlm-button__spinner svg {
+    animation: none;
+  }
+
+  .vlm-skeleton--shimmer {
+    animation: none;
+    background-image: none;
+  }
+
+  /* The answer row keeps its cross-fade: an instant repaint of a 56px tinted
+   * surface is a flash, which is worse for a motion-sensitive user than a
+   * 140ms fade. Reduced motion is not zero motion. */
+  .vlm-answer,
+  .vlm-answer[data-state='revealed'] {
+    transition-delay: var(--vlm-stagger-none);
+  }
+}
+
+/* prefers-contrast: borders carry the state when tints are unreliable. */
+@media (prefers-contrast: more) {
+  .vlm-answer {
+    border-width: 2px;
+  }
+
+  .vlm-answer[data-state='selected'],
+  .vlm-answer[data-state='correct'],
+  .vlm-answer[data-state='incorrect'] {
+    --answer-ring: inset 0 0 0 2px var(--answer-border);
+  }
+
+  .vlm-timer[data-level='warning'],
+  .vlm-timer[data-level='urgent'] {
+    outline: 1px solid currentColor;
+  }
+}

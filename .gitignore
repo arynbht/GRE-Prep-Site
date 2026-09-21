@@ -1,0 +1,17 @@
+node_modules
+dist
+dist-ssr
+.env
+.env.local
+*.local
+*.db
+*.db-journal
+.DS_Store
+.vite
+*.log
+
+# UI/UX Pro Max skill, installed per-machine with `uipro init -a claude`.
+# 172 files / 4.6MB of catalogues that every developer can regenerate, so it is
+# not worth the repo size. Ignore the skills only, not all of .claude — project
+# settings belong in version control.
+.claude/skills/

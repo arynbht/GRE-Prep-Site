@@ -1,0 +1,93 @@
+{
+  "$description": "Glassmorphism theme, from the UI/UX Pro Max design-system query for 'education test prep saas professional calm'. This palette REPLACES the Vellum semantic layer on pre-test surfaces by redefining the same --vlm-* token names, so no component changes.",
+  "$source": "ui-ux-pro-max --design-system, variance 4 / motion 3 / density 5",
+
+  "palette": {
+    "$description": "Exactly as returned by the skill.",
+    "primary": "#2563EB",
+    "on-primary": "#FFFFFF",
+    "secondary": "#3B82F6",
+    "on-secondary": "#000000",
+    "accent": "#EA580C",
+    "on-accent": "#000000",
+    "background": "#F8FAFC",
+    "foreground": "#1E293B",
+    "card": "#FFFFFF",
+    "card-foreground": "#1E293B",
+    "muted": "#E9EFF8",
+    "muted-foreground": "#475569",
+    "border": "#E2E8F0",
+    "destructive": "#DC2626",
+    "on-destructive": "#FFFFFF",
+    "ring": "#2563EB"
+  },
+
+  "ramp": {
+    "$description": "Derived from the skill's primary/accent so tints, hovers and dark variants stay in family.",
+    "blue": {
+      "50": "#EFF6FF",
+      "100": "#DBEAFE",
+      "200": "#BFDBFE",
+      "300": "#93C5FD",
+      "400": "#60A5FA",
+      "500": "#3B82F6",
+      "600": "#2563EB",
+      "700": "#1D4ED8",
+      "800": "#1E40AF",
+      "900": "#1E3A8A",
+      "950": "#172554"
+    },
+    "orange": {
+      "50": "#FFF7ED",
+      "100": "#FFEDD5",
+      "200": "#FED7AA",
+      "300": "#FDBA74",
+      "400": "#FB923C",
+      "500": "#F97316",
+      "600": "#EA580C",
+      "700": "#C2410C",
+      "800": "#9A3412",
+      "900": "#7C2D12",
+      "950": "#431407"
+    },
+    "slate": {
+      "0": "#FFFFFF",
+      "50": "#F8FAFC",
+      "100": "#F1F5F9",
+      "200": "#E2E8F0",
+      "300": "#CBD5E1",
+      "400": "#94A3B8",
+      "500": "#64748B",
+      "600": "#475569",
+      "700": "#334155",
+      "800": "#1E293B",
+      "850": "#18253A",
+      "900": "#0F172A",
+      "950": "#020617"
+    }
+  },
+
+  "glass": {
+    "$description": "Effect values from the skill: backdrop blur 10-20px, 1px rgba-white border, light reflection, z-depth.",
+    "blur": "16px",
+    "blur-strong": "20px",
+    "light-surface": "rgb(255 255 255 / 0.72)",
+    "light-surface-strong": "rgb(255 255 255 / 0.85)",
+    "light-border": "rgb(255 255 255 / 0.65)",
+    "light-edge": "rgb(15 23 42 / 0.06)",
+    "dark-surface": "rgb(30 41 59 / 0.62)",
+    "dark-surface-strong": "rgb(30 41 59 / 0.80)",
+    "dark-border": "rgb(255 255 255 / 0.12)",
+    "dark-edge": "rgb(0 0 0 / 0.40)",
+    "sheen": "linear-gradient(140deg, rgb(255 255 255 / 0.28) 0%, rgb(255 255 255 / 0) 42%)",
+    "sheen-dark": "linear-gradient(140deg, rgb(255 255 255 / 0.10) 0%, rgb(255 255 255 / 0) 42%)"
+  },
+
+  "motion": {
+    "$description": "Scroll Reveal (Subtle) tier from the skill. Implemented with IntersectionObserver rather than GSAP: identical duration, easing curve and offset, ~0.5KB instead of ~50KB.",
+    "reveal-duration": "350ms",
+    "reveal-easing": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    "reveal-offset": "12px",
+    "reveal-stagger": "45ms"
+  }
+}
