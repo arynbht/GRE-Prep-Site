@@ -16,3 +16,5 @@ dist-ssr
 # not worth the repo size. Ignore the skills only, not all of .claude — project
 # settings belong in version control.
 .claude/skills/
+
+.env*
