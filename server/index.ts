@@ -450,4 +450,12 @@ async function start(): Promise<void> {
   });
 }
 
-void start();
+// When self-hosting or in local dev this file is the process entry point, so it
+// prepares the schema and binds a port. On Vercel the app is imported as a
+// serverless function (see api/index.ts) and the platform invokes `app`
+// directly, so neither step runs here.
+if (!process.env.VERCEL) {
+  void start();
+}
+
+export default app;

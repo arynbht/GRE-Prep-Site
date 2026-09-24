@@ -9,6 +9,7 @@ dist-ssr
 .DS_Store
 .vite
 *.log
+.vercel
 
 # UI/UX Pro Max skill, installed per-machine with `uipro init -a claude`.
 # 172 files / 4.6MB of catalogues that every developer can regenerate, so it is
